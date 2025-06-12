@@ -30,8 +30,8 @@ export default function GameInterface({
   const [redeemModalOpen, setRedeemModalOpen] = useState(false);
 
   const userAvatarUrl = gameState.user?.gender === 'girl'
-    ? 'https://i.pravatar.cc/100?img=9'
-    : 'https://i.pravatar.cc/100?img=8';
+    ? 'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100'
+    : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100';
 
   return (
     <div className="game-bg min-h-screen max-w-md mx-auto">
