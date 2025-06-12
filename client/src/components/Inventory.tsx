@@ -65,8 +65,16 @@ export default function Inventory({
         {gear.map((gearName) => (
           <div
             key={gearName}
-            className="bg-blue-100 rounded-lg p-2 text-center border-2 border-blue-200 hover:border-blue-300 transition-colors"
+            className="bg-blue-100 rounded-lg p-2 text-center border-2 border-blue-200 hover:border-blue-300 transition-colors cursor-grab active:cursor-grabbing"
             title={gearName}
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', gearName);
+              e.dataTransfer.effectAllowed = 'copy';
+            }}
+            onDragEnd={() => {
+              // Reset any drag states if needed
+            }}
           >
             <div className="text-lg">{getGearEmoji(gearName)}</div>
             <div className="text-xs font-semibold">1</div>
@@ -79,6 +87,15 @@ export default function Inventory({
             <div className="text-4xl mb-2">📦</div>
             <p className="text-sm">Your inventory is empty!</p>
             <p className="text-xs text-gray-400">Buy seeds or gear to get started.</p>
+          </div>
+        )}
+        
+        {/* Gear Usage Instructions */}
+        {gear.length > 0 && (
+          <div className="col-span-4 mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-xs text-blue-700 text-center">
+              💡 Drag gear items onto plants to use them!
+            </p>
           </div>
         )}
       </div>

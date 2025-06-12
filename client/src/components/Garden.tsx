@@ -12,6 +12,8 @@ interface GardenProps {
 export default function Garden({ gameState, updateGameState, seeds }: GardenProps) {
   const [selectedPlot, setSelectedPlot] = useState<number | null>(null);
   const [seedSelectionOpen, setSeedSelectionOpen] = useState(false);
+  const [draggedGear, setDraggedGear] = useState<string | null>(null);
+  const [dragOverPlot, setDragOverPlot] = useState<number | null>(null);
 
   // Get plant stage image based on growth percentage
   const getPlantStageImage = (plotData: PlotData) => {
@@ -96,6 +98,69 @@ export default function Garden({ gameState, updateGameState, seeds }: GardenProp
     }
   };
 
+  // Handle gear drag and drop
+  const handleDragOver = (e: React.DragEvent, plotIndex: number) => {
+    e.preventDefault();
+    setDragOverPlot(plotIndex);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverPlot(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, plotIndex: number) => {
+    e.preventDefault();
+    const gearName = e.dataTransfer.getData('text/plain');
+    const plotData = gameState.garden[plotIndex];
+    
+    if (!plotData || !gearName) {
+      setDragOverPlot(null);
+      return;
+    }
+
+    applyGearToPlant(gearName, plotIndex);
+    setDragOverPlot(null);
+  };
+
+  const applyGearToPlant = (gearName: string, plotIndex: number) => {
+    const plotData = gameState.garden[plotIndex];
+    if (!plotData) return;
+
+    const newGarden = [...gameState.garden];
+    
+    if (gearName === 'Watering Can') {
+      // Speed up growth by 25%
+      const seed = seeds.find(s => s.name === plotData.name);
+      if (seed && !plotData.isGrown) {
+        const newGrowthStage = Math.min(plotData.growthStage + 25, 100);
+        newGarden[plotIndex] = {
+          ...plotData,
+          growthStage: newGrowthStage,
+          isGrown: newGrowthStage >= 100
+        };
+        
+        updateGameState({ garden: newGarden });
+        alert(`Used Watering Can! Plant growth boosted by 25%! 💧`);
+      } else {
+        alert("This plant doesn't need watering right now!");
+      }
+    } else if (gearName === 'Sprinkler') {
+      // Enhance the plant's value
+      if (plotData.isGrown) {
+        const enhancedValue = Math.floor(plotData.value * 1.5);
+        newGarden[plotIndex] = {
+          ...plotData,
+          value: enhancedValue
+        };
+        
+        updateGameState({ garden: newGarden });
+        alert(`Used Sprinkler! Fruit value enhanced by 50%! 💦`);
+      } else {
+        alert("Wait for the plant to grow first!");
+      }
+    }
+  };
+
   // Plant seed
   const plantSeed = (plotIndex: number, seed: Seed) => {
     const newInventory = { ...gameState.inventory };
@@ -165,8 +230,15 @@ export default function Garden({ gameState, updateGameState, seeds }: GardenProp
         {gameState.garden.map((plotData, index) => (
           <div
             key={index}
-            className="w-14 h-14 plot-soil border-2 border-soil rounded-lg cursor-pointer hover:border-forest transition-colors flex items-center justify-center relative"
+            className={`w-14 h-14 plot-soil border-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center relative ${
+              dragOverPlot === index 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-soil hover:border-forest'
+            }`}
             onClick={() => handlePlotClick(index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, index)}
           >
             {plotData ? (
               <div className="flex flex-col items-center">
