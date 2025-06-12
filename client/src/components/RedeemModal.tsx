@@ -103,14 +103,7 @@ export default function RedeemModal({
             </div>
           )}
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-bold text-sm mb-2">Available Codes:</h4>
-            <div className="text-xs text-gray-600 space-y-1">
-              <div>• <code>dansdev</code> - 50M coins</div>
-              <div>• <code>pogi_ni_daniel</code> - 3x Candy Blossom seeds</div>
-              <div>• <code>free_super_seed</code> - 3x Super Seeds</div>
-            </div>
-          </div>
+
         </div>
       </DialogContent>
     </Dialog>

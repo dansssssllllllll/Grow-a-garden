@@ -30,90 +30,85 @@ export default function GameInterface({
   const [redeemModalOpen, setRedeemModalOpen] = useState(false);
 
   const userAvatarUrl = gameState.user?.gender === 'girl'
-    ? 'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100'
-    : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100';
+    ? 'https://i.pravatar.cc/100?img=9'
+    : 'https://i.pravatar.cc/100?img=8';
 
   return (
-    <div className="game-bg min-h-screen">
+    <div className="game-bg min-h-screen max-w-md mx-auto">
       {/* Header */}
-      <header className="bg-white bg-opacity-95 shadow-lg p-4">
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
+      <header className="bg-white bg-opacity-95 shadow-lg p-3">
+        <div className="flex justify-between items-center">
           {/* User Info */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <img 
               src={userAvatarUrl}
               alt="User avatar" 
-              className="w-12 h-12 rounded-full border-4 border-forest"
+              className="w-10 h-10 rounded-full border-3 border-forest"
             />
             <div>
-              <h1 className="font-game font-bold text-xl text-forest">
+              <h1 className="font-game font-bold text-lg text-forest">
                 {gameState.user?.firstName || 'Player'}
               </h1>
-              <p className="text-sm text-gray-600">Garden Master</p>
+              <p className="text-xs text-gray-600">Garden Master</p>
             </div>
           </div>
 
           {/* Money Display */}
-          <div className="flex items-center space-x-2 bg-gold bg-opacity-20 px-4 py-2 rounded-full border-2 border-gold">
-            <span className="text-2xl">💰</span>
-            <span className="font-bold text-xl text-yellow-800">
+          <div className="flex items-center space-x-1 bg-gold bg-opacity-20 px-3 py-1 rounded-full border-2 border-gold">
+            <span className="text-lg">💰</span>
+            <span className="font-bold text-sm text-yellow-800">
               {gameState.money.toLocaleString()}
             </span>
-            <span className="text-sm text-yellow-700">coins</span>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex max-w-7xl mx-auto p-4 gap-6">
-        {/* Left Sidebar */}
-        <div className="w-80 space-y-4">
-          {/* Shop Buttons */}
-          <div className="bg-white rounded-2xl p-4 shadow-lg">
-            <h3 className="font-game font-bold text-lg text-forest mb-4">🛍️ Shops</h3>
-            <div className="space-y-2">
-              <Button 
-                onClick={() => setSeedShopOpen(true)}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold shadow-md"
-              >
-                🌱 Seed Shop
-              </Button>
-              <Button 
-                onClick={() => setGearShopOpen(true)}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-md"
-              >
-                🔧 Gear Shop
-              </Button>
-              <Button 
-                onClick={() => setSellModalOpen(true)}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold shadow-md"
-              >
-                💰 Sell Fruits
-              </Button>
-            </div>
+      <div className="p-3 space-y-4">
+        {/* Shop Buttons */}
+        <div className="bg-white rounded-xl p-3 shadow-lg">
+          <div className="grid grid-cols-3 gap-2">
+            <Button 
+              onClick={() => setSeedShopOpen(true)}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold text-xs py-2"
+            >
+              🌱 Seeds
+            </Button>
+            <Button 
+              onClick={() => setGearShopOpen(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs py-2"
+            >
+              🔧 Gear
+            </Button>
+            <Button 
+              onClick={() => setSellModalOpen(true)}
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs py-2"
+            >
+              💰 Sell
+            </Button>
           </div>
-
-          {/* Events Display */}
-          <EventsDisplay activeEvents={gameState.activeEvents} />
-
-          {/* Inventory */}
-          <Inventory 
-            inventory={gameState.inventory} 
-            gear={gameState.gear} 
-            seeds={seeds}
-            gearItems={gear}
-            onRedeemCode={() => setRedeemModalOpen(true)}
-          />
         </div>
 
-        {/* Garden Area */}
-        <div className="flex-1">
+        {/* Garden Area - Centered */}
+        <div className="flex justify-center">
           <Garden 
             gameState={gameState}
             updateGameState={updateGameState}
             seeds={seeds}
           />
         </div>
+
+        {/* Events Display */}
+        <EventsDisplay activeEvents={gameState.activeEvents} />
+
+        {/* Inventory */}
+        <Inventory 
+          inventory={gameState.inventory} 
+          gear={gameState.gear} 
+          seeds={seeds}
+          gearItems={gear}
+          onRedeemCode={() => setRedeemModalOpen(true)}
+        />
       </div>
 
       {/* Modals */}

@@ -107,27 +107,27 @@ export default function Garden({ gameState, updateGameState, seeds }: GardenProp
   };
 
   return (
-    <div className="bg-white bg-opacity-90 rounded-2xl p-6 shadow-lg">
-      <h2 className="font-game font-bold text-2xl text-forest mb-6 text-center">
+    <div className="bg-white bg-opacity-90 rounded-2xl p-4 shadow-lg">
+      <h2 className="font-game font-bold text-lg text-forest mb-4 text-center">
         🌿 Your Garden Paradise
       </h2>
       
       {/* Garden Grid (6x5 = 30 plots) */}
-      <div className="grid grid-cols-6 gap-3 max-w-4xl mx-auto">
+      <div className="grid grid-cols-6 gap-2 max-w-sm mx-auto">
         {gameState.garden.map((plotData, index) => (
           <div
             key={index}
-            className="w-20 h-20 plot-soil border-2 border-soil rounded-lg cursor-pointer hover:border-forest transition-colors flex items-center justify-center text-2xl relative"
+            className="w-12 h-12 plot-soil border-2 border-soil rounded-lg cursor-pointer hover:border-forest transition-colors flex items-center justify-center relative"
             onClick={() => handlePlotClick(index)}
           >
             {plotData ? (
               plotData.isGrown ? (
-                <span className="text-3xl animate-pulse">{plotData.emoji}</span>
+                <span className="text-2xl animate-pulse">{plotData.emoji}</span>
               ) : (
-                <span className="text-xl">🌱</span>
+                <span className="text-lg">🌱</span>
               )
             ) : (
-              <span className="text-gray-400 text-3xl">+</span>
+              <span className="text-gray-400 text-xl">+</span>
             )}
           </div>
         ))}
