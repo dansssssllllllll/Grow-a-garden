@@ -13,6 +13,68 @@ export default function Garden({ gameState, updateGameState, seeds }: GardenProp
   const [selectedPlot, setSelectedPlot] = useState<number | null>(null);
   const [seedSelectionOpen, setSeedSelectionOpen] = useState(false);
 
+  // Get plant stage image based on growth percentage
+  const getPlantStageImage = (plotData: PlotData) => {
+    if (!plotData) return '';
+    
+    const { growthStage, name } = plotData;
+    
+    if (growthStage < 25) {
+      return '🌱'; // Seed/sprout stage
+    } else if (growthStage < 50) {
+      return '🌿'; // Young plant stage  
+    } else if (growthStage < 75) {
+      return '🌾'; // Growing stage
+    } else if (growthStage >= 100) {
+      return plotData.emoji; // Fully grown fruit
+    } else {
+      return '🌿'; // Default growing stage
+    }
+  };
+
+  // Calculate growth progress
+  const calculateGrowthProgress = (plotData: PlotData, seed: Seed) => {
+    const elapsed = Date.now() - plotData.plantedAt;
+    const progress = Math.min((elapsed / seed.growTime) * 100, 100);
+    return progress;
+  };
+
+  // Update growth stages periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedGarden = gameState.garden.map((plotData, index) => {
+        if (!plotData || plotData.isGrown) return plotData;
+        
+        const seed = seeds.find(s => s.name === plotData.name);
+        if (!seed) return plotData;
+        
+        const newProgress = calculateGrowthProgress(plotData, seed);
+        const isNowGrown = newProgress >= 100;
+        
+        return {
+          ...plotData,
+          growthStage: newProgress,
+          isGrown: isNowGrown
+        };
+      });
+      
+      // Only update if there are changes
+      const hasChanges = updatedGarden.some((plot, index) => {
+        const original = gameState.garden[index];
+        return plot && original && (
+          plot.growthStage !== original.growthStage || 
+          plot.isGrown !== original.isGrown
+        );
+      });
+      
+      if (hasChanges) {
+        updateGameState({ garden: updatedGarden });
+      }
+    }, 1000); // Update every second
+    
+    return () => clearInterval(interval);
+  }, [gameState.garden, seeds, updateGameState]);
+
   // Handle plot click
   const handlePlotClick = (plotIndex: number) => {
     const plotData = gameState.garden[plotIndex];
@@ -48,28 +110,14 @@ export default function Garden({ gameState, updateGameState, seeds }: GardenProp
       emoji: seed.emoji,
       value: seed.value,
       plantedAt: Date.now(),
-      isGrown: false
+      isGrown: false,
+      growthStage: 0
     };
 
     // Apply watering can effect (5% chance to skip growth)
     if (gameState.gear.includes('Watering Can') && Math.random() < 0.05) {
       plotData.isGrown = true;
-    } else {
-      // Start growth timer
-      setTimeout(() => {
-        const currentGarden = JSON.parse(localStorage.getItem('gardenGameState') || '{}').garden || [];
-        if (currentGarden[plotIndex] && !currentGarden[plotIndex].isGrown) {
-          const updatedGarden = [...currentGarden];
-          updatedGarden[plotIndex] = { ...updatedGarden[plotIndex], isGrown: true };
-          
-          const savedState = JSON.parse(localStorage.getItem('gardenGameState') || '{}');
-          savedState.garden = updatedGarden;
-          localStorage.setItem('gardenGameState', JSON.stringify(savedState));
-          
-          // Trigger re-render
-          updateGameState({ garden: updatedGarden });
-        }
-      }, seed.growTime);
+      plotData.growthStage = 100;
     }
 
     newGarden[plotIndex] = plotData;
@@ -117,15 +165,26 @@ export default function Garden({ gameState, updateGameState, seeds }: GardenProp
         {gameState.garden.map((plotData, index) => (
           <div
             key={index}
-            className="w-12 h-12 plot-soil border-2 border-soil rounded-lg cursor-pointer hover:border-forest transition-colors flex items-center justify-center relative"
+            className="w-14 h-14 plot-soil border-2 border-soil rounded-lg cursor-pointer hover:border-forest transition-colors flex items-center justify-center relative"
             onClick={() => handlePlotClick(index)}
           >
             {plotData ? (
-              plotData.isGrown ? (
-                <span className="text-2xl animate-pulse">{plotData.emoji}</span>
-              ) : (
-                <span className="text-lg">🌱</span>
-              )
+              <div className="flex flex-col items-center">
+                <span className={`text-2xl transition-all duration-500 ${plotData.isGrown ? 'animate-bounce' : ''}`}>
+                  {getPlantStageImage(plotData)}
+                </span>
+                {!plotData.isGrown && (
+                  <div className="w-8 h-1 bg-gray-200 rounded-full mt-1">
+                    <div 
+                      className="h-full bg-green-500 rounded-full transition-all duration-300"
+                      style={{ width: `${plotData.growthStage}%` }}
+                    />
+                  </div>
+                )}
+                {plotData.isGrown && (
+                  <div className="text-xs text-green-600 font-bold animate-pulse">Ready!</div>
+                )}
+              </div>
             ) : (
               <span className="text-gray-400 text-xl">+</span>
             )}

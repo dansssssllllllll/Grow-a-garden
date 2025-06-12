@@ -57,6 +57,18 @@ export function useGameState() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        // Migrate old garden data to include growthStage
+        if (parsed.garden) {
+          parsed.garden = parsed.garden.map((plot: any) => {
+            if (plot && typeof plot.growthStage === 'undefined') {
+              return {
+                ...plot,
+                growthStage: plot.isGrown ? 100 : 0
+              };
+            }
+            return plot;
+          });
+        }
         setGameState(prev => ({ ...prev, ...parsed }));
       } catch (error) {
         console.error('Failed to load game state:', error);

@@ -28,6 +28,7 @@ export interface PlotData {
   value: number;
   plantedAt: number;
   isGrown: boolean;
+  growthStage: number; // 0-100 percentage
 }
 
 export interface UserProfile {
